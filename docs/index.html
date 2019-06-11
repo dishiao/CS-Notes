@@ -120,6 +120,10 @@
             padding-left: 0px !important;
             padding-right: 0px !important;
         }
+
+        .docsify-copy-code-button {
+            display: none;
+        }
     }
 
     .markdown-section pre {
@@ -234,6 +238,32 @@
         transform: rotate(2deg);
     }
 
+    /*黑色*/
+    .token.function,
+    .token.operator,
+    .token.class-name {
+        color: #2C3E50;
+    }
+
+    /*深蓝加粗*/
+    .token.keyword {
+        color: #124363;
+        font-weight: bold;   
+    }
+
+
+    /*浅蓝*/
+    .token.property,
+    .token.tag,
+    .token.boolean,
+    .token.number,
+    .token.function-name,
+    .token.constant,
+    .token.symbol,
+    .token.deleted {
+        color: #2980B9;
+    }
+
     .token.comment,
     .token.block-comment,
     .token.prolog,
@@ -246,28 +276,17 @@
         color: #5F6364;
     }
 
-    .token.property,
-    .token.tag,
-    .token.boolean,
-    .token.number,
-    .token.function-name,
-    .token.constant,
-    .token.symbol,
-    .token.deleted {
-        color: #c92c2c;
-    }
 
     .token.selector,
     .token.attr-name,
     .token.string,
     .token.char,
-    .token.function,
     .token.builtin,
     .token.inserted {
-        color: #2f9c0a;
+        color: #1ABC9C;
+        font-weight: bold;   
     }
 
-    .token.operator,
     .token.entity,
     .token.url,
     .token.variable {
@@ -276,9 +295,7 @@
     }
 
     .token.atrule,
-    .token.attr-value,
-    .token.keyword,
-    .token.class-name {
+    .token.attr-value {
         color: #1990b8;
     }
 
@@ -367,7 +384,6 @@
     window.$docsify = {
         maxAge: 100,
         name: 'CS-Notes',
-        nameLink: 'https://cyc2018.github.io/CS-Notes/#/README',
         repo: 'https://github.com/CyC2018/CS-Notes',
         search: {
             paths: 'auto',
@@ -387,7 +403,7 @@
     <script src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/prism-bash.min.js"></script>
     <script src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/prism-sql.min.js"></script>
     <script src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/zoom-image.min.js"></script>
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <!-- <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> -->
 </body>
 
 </html>

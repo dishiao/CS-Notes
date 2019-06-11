@@ -18,7 +18,7 @@
 
 ## 题目描述
 
-```html
+```
 true
 
 "+100"
@@ -26,7 +26,9 @@ true
 "-123"
 "3.1416"
 "-1E-16"
+```
 
+```
 false
 
 "12e"
@@ -44,9 +46,9 @@ false
 ```html
 []  ： 字符集合
 ()  ： 分组
-?   ： 重复 0 ~ 1
-+   ： 重复 1 ~ n
-*   ： 重复 0 ~ n
+?   ： 重复 0 ~ 1 次
++   ： 重复 1 ~ n 次
+*   ： 重复 0 ~ n 次
 .   ： 任意字符
 \\. ： 转义后的 .
 \\d ： 数字
@@ -68,16 +70,18 @@ public boolean isNumeric(char[] str) {
 
 需要保证奇数和奇数，偶数和偶数之间的相对位置不变，这和书本不太一样。
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/d03a2efa-ef19-4c96-97e8-ff61df8061d3.png" width="200px"> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/d03a2efa-ef19-4c96-97e8-ff61df8061d3.png" width="200px"> </div><br>
 
 ## 解题思路
+
+方法一：创建一个新数组，时间复杂度 O(N)，空间复杂度 O(N)。
 
 ```java
 public void reOrderArray(int[] nums) {
     // 奇数个数
     int oddCnt = 0;
-    for (int val : nums)
-        if (val % 2 == 1)
+    for (int x : nums)
+        if (!isEven(x))
             oddCnt++;
     int[] copy = nums.clone();
     int i = 0, j = oddCnt;
@@ -88,6 +92,35 @@ public void reOrderArray(int[] nums) {
             nums[j++] = num;
     }
 }
+
+private boolean isEven(int x) {
+    return x % 2 == 0;
+}
+```
+
+方法二：使用冒泡思想，每次都当前偶数上浮到当前最右边。时间复杂度 O(N<sup>2</sup>)，空间复杂度 O(1)，时间换空间。
+
+```java
+public void reOrderArray(int[] nums) {
+    int N = nums.length;
+    for (int i = N - 1; i > 0; i--) {
+        for (int j = 0; j < i; j++) {
+            if (isEven(nums[j]) && !isEven(nums[j + 1])) {
+                swap(nums, j, j + 1);
+            }
+        }
+    }
+}
+
+private boolean isEven(int x) {
+    return x % 2 == 0;
+}
+
+private void swap(int[] nums, int i, int j) {
+    int t = nums[i];
+    nums[i] = nums[j];
+    nums[j] = t;
+}
 ```
 
 # 22. 链表中倒数第 K 个结点
@@ -96,9 +129,9 @@ public void reOrderArray(int[] nums) {
 
 ## 解题思路
 
-设链表的长度为 N。设两个指针 P1 和 P2，先让 P1 移动 K 个节点，则还有 N - K 个节点可以移动。此时让 P1 和 P2 同时移动，可以知道当 P1 移动到链表结尾时，P2 移动到 N - K 个节点处，该位置就是倒数第 K 个节点。
+设链表的长度为 N。设置两个指针 P1 和 P2，先让 P1 移动 K 个节点，则还有 N - K 个节点可以移动。此时让 P1 和 P2 同时移动，可以知道当 P1 移动到链表结尾时，P2 移动到第 N - K 个节点处，该位置就是倒数第 K 个节点。
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/6b504f1f-bf76-4aab-a146-a9c7a58c2029.png" width="500"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/6b504f1f-bf76-4aab-a146-a9c7a58c2029.png" width="500"/> </div><br>
 
 ```java
 public ListNode FindKthToTail(ListNode head, int k) {
@@ -132,7 +165,7 @@ public ListNode FindKthToTail(ListNode head, int k) {
 
 在相遇点，slow 要到环的入口点还需要移动 z 个节点，如果让 fast 重新从头开始移动，并且速度变为每次移动一个节点，那么它到环入口点还需要移动 x 个节点。在上面已经推导出 x=z，因此 fast 和 slow 将在环入口点相遇。
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/bb7fc182-98c2-4860-8ea3-630e27a5f29f.png" width="500"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/bb7fc182-98c2-4860-8ea3-630e27a5f29f.png" width="500"/> </div><br>
 
 ```java
 public ListNode EntryNodeOfLoop(ListNode pHead) {
@@ -174,6 +207,8 @@ public ListNode ReverseList(ListNode head) {
 
 ### 迭代
 
+使用头插法。
+
 ```java
 public ListNode ReverseList(ListNode head) {
     ListNode newList = new ListNode(-1);
@@ -193,7 +228,7 @@ public ListNode ReverseList(ListNode head) {
 
 ## 题目描述
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/c094d2bc-ec75-444b-af77-d369dfb6b3b4.png" width="400"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/c094d2bc-ec75-444b-af77-d369dfb6b3b4.png" width="400"/> </div><br>
 
 ## 解题思路
 
@@ -245,7 +280,7 @@ public ListNode Merge(ListNode list1, ListNode list2) {
 
 ## 题目描述
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/84a5b15a-86c5-4d8e-9439-d9fd5a4699a1.jpg" width="450"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/84a5b15a-86c5-4d8e-9439-d9fd5a4699a1.jpg" width="450"/> </div><br>
 
 ## 解题思路
 
@@ -273,7 +308,7 @@ private boolean isSubtreeWithRoot(TreeNode root1, TreeNode root2) {
 
 ## 题目描述
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/0c12221f-729e-4c22-b0ba-0dfc909f8adf.jpg" width="300"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/0c12221f-729e-4c22-b0ba-0dfc909f8adf.jpg" width="300"/> </div><br>
 
 ## 解题思路
 
@@ -299,7 +334,7 @@ private void swap(TreeNode root) {
 
 ## 题目描述
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/0c12221f-729e-4c22-b0ba-0dfc909f8adf.jpg" width="300"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/0c12221f-729e-4c22-b0ba-0dfc909f8adf.jpg" width="300"/> </div><br>
 
 ## 解题思路
 
@@ -329,7 +364,7 @@ boolean isSymmetrical(TreeNode t1, TreeNode t2) {
 
 下图的矩阵顺时针打印结果为：1, 2, 3, 4, 8, 12, 16, 15, 14, 13, 9, 5, 6, 7, 11, 10
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/48517227-324c-4664-bd26-a2d2cffe2bfe.png" width="200px"> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/48517227-324c-4664-bd26-a2d2cffe2bfe.png" width="200px"> </div><br>
 
 ## 解题思路
 
@@ -357,5 +392,10 @@ public ArrayList<Integer> printMatrix(int[][] matrix) {
 
 
 
-</br><div align="center">🎨️欢迎关注我的公众号 CyC2018，在公众号后台回复关键字 **资料** 可领取复习大纲，这份大纲是我花了一整年时间整理的面试知识点列表，不仅系统整理了面试知识点，而且标注了各个知识点的重要程度，从而帮你理清多而杂的面试知识点。可以说我基本是按照这份大纲来进行复习的，这份大纲对我拿到了 BAT 头条等 Offer 起到很大的帮助。你们完全可以和我一样根据大纲上列的知识点来进行复习，就不用看很多不重要的内容，也可以知道哪些内容很重要从而多安排一些复习时间。</div></br>
-<div align="center"><img width="180px" src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/%E5%85%AC%E4%BC%97%E5%8F%B7.jpg"></img></div>
+# 微信公众号
+
+
+微信公众号 CyC2018 提供了该项目的离线阅读版本，后台回复 "下载" 即可领取。也提供了一份技术面试复习大纲，不仅系统整理了面试知识点，而且标注了各个知识点的重要程度，从而帮你理清多而杂的面试知识点，后台回复 "大纲" 即可领取。我基本是按照这个大纲来进行复习的，对我拿到了 BAT 头条等 Offer 起到很大的帮助。你们完全可以和我一样根据大纲上列的知识点来进行复习，就不用看很多不重要的内容，也可以知道哪些内容很重要从而多安排一些复习时间。
+
+
+<img width="580px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/other/公众号海报2.png"></img>

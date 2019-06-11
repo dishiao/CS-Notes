@@ -143,7 +143,9 @@ System.out.println(m == n); // true
 - int values between -128 and 127
 - char in the range \u0000 to \u007F
 
-在使用这些基本类型对应的包装类型时，就可以直接使用缓冲池中的对象。
+在使用这些基本类型对应的包装类型时，如果该数值范围在缓冲池范围内，就可以直接使用缓冲池中的对象。
+
+在 jdk 1.8 所有的数值类缓冲池中，Integer 的缓冲池 IntegerCache 很特殊，这个缓冲池的下界是 - 128，上界默认是 127，但是这个上界是可调的，在启动 jvm 的时候，通过 -XX:AutoBoxCacheMax=&lt;size&gt; 来指定这个缓冲池的大小，该选项在 JVM 初始化的时候会设定一个名为 java.lang.IntegerCache.high 系统属性，然后 IntegerCache 初始化的时候就会读取该系统属性来决定上界。
 
 [StackOverflow : Differences between new Integer(123), Integer.valueOf(123) and just 123
 ](https://stackoverflow.com/questions/9030817/differences-between-new-integer123-integer-valueof123-and-just-123)
@@ -189,7 +191,7 @@ value 数组被声明为 final，这意味着 value 数组初始化之后就不�
 
 如果一个 String 对象已经被创建过了，那么就会从 String Pool 中取得引用。只有 String 是不可变的，才可能使用 String Pool。
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/8ea6d399-ebcb-4077-b9c7-b2d825fe256c_200.png" width="300px"> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/9112288f-23f5-4e53-b222-a46fdbca1603.png" width="300px"> </div><br>
 
 **3. 安全性** 
 
@@ -467,7 +469,6 @@ public class AccessExample {
 
 可以使用公有的 getter 和 setter 方法来替换公有字段，这样的话就可以控制对字段的修改行为。
 
-
 ```java
 public class AccessExample {
 
@@ -670,7 +671,11 @@ SuperExtendExample.func()
 
 存在于继承体系中，指子类实现了一个与父类在方法声明上完全相同的一个方法。
 
-为了满足里式替换原则，重写有有以下两个限制：
+为了满足里式替换原则，重写有以下三个限制：
+
+- 子类方法的访问权限必须大于等于父类方法；
+- 子类方法的返回类型必须是父类方法返回类型或为其子类型。
+- 子类方法抛出的异常类型必须是父类抛出异常类型或为其子类型。
 
 使用 @Override 注解，可以让编译器帮忙检查是否满足上面的三个限制条件。
 
@@ -696,70 +701,81 @@ class SubClass extends SuperClass {
 }
 ```
 
-**2. 重载（Overload）** 
+在调用一个方法时，先从本类中查找看是否有对应的方法，如果没有查找到再到父类中查看，看是否有继承来的方法。否则就要对参数进行转型，转成父类之后看是否有对应的方法。总的来说，方法调用的优先级为：
 
-存在于同一个类中，指一个方法与已经存在的方法名称上相同，但是参数类型、个数、顺序至少有一个不同。
+- this.func(this)
+- super.func(this)
+- this.func(super)
+- super.func(super)
 
-应该注意的是，返回值不同，其它都相同不算是重载。
-
-**3. 实例** 
 
 ```java
+/*
+    A
+    |
+    B
+    |
+    C
+    |
+    D
+ */
+
+
 class A {
-    public String show(D obj) {
-        return ("A and D");
+
+    public void show(A obj) {
+        System.out.println("A.show(A)");
     }
 
-    public String show(A obj) {
-        return ("A and A");
+    public void show(C obj) {
+        System.out.println("A.show(C)");
     }
 }
 
 class B extends A {
-    public String show(B obj) {
-        return ("B and B");
-    }
 
-    public String show(A obj) {
-        return ("B and A");
+    @Override
+    public void show(A obj) {
+        System.out.println("B.show(A)");
     }
 }
 
 class C extends B {
 }
 
-class D extends B {
+class D extends C {
 }
 ```
 
 ```java
-public class Test {
+public static void main(String[] args) {
 
-    public static void main(String[] args) {
-        A a1 = new A();
-        A a2 = new B();
-        B b = new B();
-        C c = new C();
-        D d = new D();
-        System.out.println(a1.show(b)); // A and A
-        System.out.println(a1.show(c)); // A and A
-        System.out.println(a1.show(d)); // A and D
-        System.out.println(a2.show(b)); // B and A
-        System.out.println(a2.show(c)); // B and A
-        System.out.println(a2.show(d)); // A and D
-        System.out.println(b.show(b));  // B and B
-        System.out.println(b.show(c));  // B and B
-        System.out.println(b.show(d));  // A and D
-    }
+    A a = new A();
+    B b = new B();
+    C c = new C();
+    D d = new D();
+
+    // 在 A 中存在 show(A obj)，直接调用
+    a.show(a); // A.show(A)
+    // 在 A 中不存在 show(B obj)，将 B 转型成其父类 A
+    a.show(b); // A.show(A)
+    // 在 B 中存在从 A 继承来的 show(C obj)，直接调用
+    b.show(c); // A.show(C)
+    // 在 B 中不存在 show(D obj)，但是存在从 A 继承来的 show(C obj)，将 D 转型成其父类 C
+    b.show(d); // A.show(C)
+
+    // 引用的还是 B 对象，所以 ba 和 b 的调用结果一样
+    A ba = new B();
+    ba.show(c); // A.show(C)
+    ba.show(d); // A.show(C)
 }
 ```
 
-涉及到重写时，方法调用的优先级为：
+**2. 重载（Overload）** 
 
-- this.show(O)
-- super.show(O)
-- this.show((super)O)
-- super.show((super)O)
+存在于同一个类中，指一个方法与已经存在的方法名称上相同，但是参数类型、个数、顺序至少有一个不同。
+
+应该注意的是，返回值不同，其它都相同不算是重载。
 
 # 五、Object 通用方法
 
@@ -1338,7 +1354,7 @@ Throwable 可以用来表示任何可以作为异常抛出的类，分为两种�
 -  **受检异常** ：需要用 try...catch... 语句捕获并进行处理，并且可以从异常中恢复；
 -  **非受检异常** ：是程序运行时错误，例如除 0 会引发 Arithmetic Exception，此时程序崩溃并且无法恢复。
 
-<div align="center"> <img src="https://gitee.com/CyC2018/CS-Notes/raw/master/docs/pics/PPjwP.png" width="600"/> </div><br>
+<div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/PPjwP.png" width="600"/> </div><br>
 
 - [Java 入门之异常处理](https://www.tianmaying.com/tutorial/Java-Exception)
 - [Java 异常的面试问题及答案 -Part 1](http://www.importnew.com/7383.html)
@@ -1419,5 +1435,10 @@ Java 注解是附加在代码中的一些元信息，用于一些工具在编译
 
 
 
-</br><div align="center">🎨️欢迎关注我的公众号 CyC2018，在公众号后台回复关键字 **资料** 可领取复习大纲，这份大纲是我花了一整年时间整理的面试知识点列表，不仅系统整理了面试知识点，而且标注了各个知识点的重要程度，从而帮你理清多而杂的面试知识点。可以说我基本是按照这份大纲来进行复习的，这份大纲对我拿到了 BAT 头条等 Offer 起到很大的帮助。你们完全可以和我一样根据大纲上列的知识点来进行复习，就不用看很多不重要的内容，也可以知道哪些内容很重要从而多安排一些复习时间。</div></br>
-<div align="center"><img width="180px" src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/%E5%85%AC%E4%BC%97%E5%8F%B7.jpg"></img></div>
+# 微信公众号
+
+
+微信公众号 CyC2018 提供了该项目的离线阅读版本，后台回复 "下载" 即可领取。也提供了一份技术面试复习大纲，不仅系统整理了面试知识点，而且标注了各个知识点的重要程度，从而帮你理清多而杂的面试知识点，后台回复 "大纲" 即可领取。我基本是按照这个大纲来进行复习的，对我拿到了 BAT 头条等 Offer 起到很大的帮助。你们完全可以和我一样根据大纲上列的知识点来进行复习，就不用看很多不重要的内容，也可以知道哪些内容很重要从而多安排一些复习时间。
+
+
+<img width="580px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/other/公众号海报2.png"></img>
